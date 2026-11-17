@@ -115,4 +115,43 @@ class StockService
         return $summary;
     }
 
+    public function movementHistory($productId, $filters = [])
+    {
+        $stockin = StockMovementType::STOCK_IN->value;
+        $stokout = StockMovementType::STOCK_OUT->value;
+        $q = StockMovement::where('product_id', $productId)
+            ->when($filters['date_from'] ?? null, fn ($query, $date) =>
+                $query->whereDate('moved_at', '>=', $date)
+            )
+            ->when($filters['date_to'] ?? null, fn ($query, $date) =>
+                $query->whereDate('moved_at', '<=', $date)
+            );
+        $data = (clone $q)
+            ->selectRaw(
+                'COALESCE(SUM(CASE WHEN movement_type = ? THEN quantity ELSE 0 END), 0) as total_units_in',
+                [$stockin]
+            )
+            ->selectRaw(
+                'COALESCE(SUM(CASE WHEN movement_type = ? THEN quantity ELSE 0 END), 0) as total_units_out',
+                [$stokout]
+            )
+            ->first();
+
+        $unitin = (int) $data->total_units_in;
+        $unitout = (int) $data->total_units_out;
+        $movements = $q
+            ->with('warehouse')
+            ->latest('moved_at')
+            ->latest('id')
+            ->simplePaginate($filters['per_page'] ?? 20);
+
+        return [
+            'movements' => $movements,
+            'summary' => [
+                'total_units_in' => $unitin,
+                'total_units_out' => $unitout,
+                'net_movement' => $unitin - $unitout,
+            ],
+        ];
+    }
 }

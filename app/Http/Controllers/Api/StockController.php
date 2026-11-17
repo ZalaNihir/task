@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MovementHistoryRequest;
 use App\Http\Requests\StockAdjustmentRequest;
 use App\Http\Resources\InventorySummaryResource;
+use App\Http\Resources\MovementHistoryResource;
 use App\Http\Resources\StockAdjustmentResource;
 use App\Services\StockService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class StockController extends Controller
 {
@@ -27,4 +30,20 @@ class StockController extends Controller
         return InventorySummaryResource::collection($summary);
     }
 
+    public function history(MovementHistoryRequest $request,$id)
+    {
+        $result = $this->stockService->movementHistory(
+            $id,
+            $request->validated()
+        );
+        Log::info('Movements-----',[$result['movements']]);
+        return MovementHistoryResource::collection($result['movements'])
+            ->additional([
+                'summary' => [
+                    'total_units_in' => $result['summary']['total_units_in'],
+                    'total_units_out' => $result['summary']['total_units_out'],
+                    'net_movement' => $result['summary']['net_movement'],
+                ],
+            ]);
+    }
 }

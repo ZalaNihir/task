@@ -19,4 +19,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('warehouse',WarehouseController::class);
     Route::post('/stock/adjust', [StockController::class, 'adjust']);
     Route::get('/inventory/summary', [StockController::class, 'summary']);
+    Route::get('/products/{id}/movements',[StockController::class, 'history']);
 });
