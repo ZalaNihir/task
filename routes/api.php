@@ -11,6 +11,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('categories/tree', [CategoryController::class, 'tree']);
+    Route::get('categories/tree', [CategoryController::class, 'tree'])->name('categories.tree');
+    Route::apiResource('categories',CategoryController::class);
     Route::get('products',[ProductController::class,'index']);
 });

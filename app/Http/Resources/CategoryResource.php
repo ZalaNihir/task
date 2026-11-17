@@ -19,7 +19,15 @@ class CategoryResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'is_active' => $this->is_active,
-            'children' => CategoryResource::collection($this->children),
+            'parent_id' => $this->parent_id,
+            'children'  => $this->when(
+                $request->routeIs('categories.tree', 'categories.show'),
+                fn () => CategoryResource::collection($this->whenLoaded('children'))
+            ),
+            'parent'    => $this->when(
+                $request->routeIs('categories.show'),
+                fn () => new CategoryResource($this->whenLoaded('parent'))
+            ),
         ];
     }
 }

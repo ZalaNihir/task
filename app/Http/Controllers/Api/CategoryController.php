@@ -3,34 +3,53 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CategoryFormRequest;
+use App\Http\Requests\CategoryIndexRequest;
 use App\Http\Resources\CategoryResource;
-use App\Models\Category;
-use Illuminate\Support\Facades\Cache;
+use App\Services\CategoryService;
 
 class CategoryController extends Controller
 {
+    public function __construct(protected CategoryService $categoryService){}
+
+    public function index(CategoryIndexRequest $request){
+        $validate = $request->validated();
+        $categories = $this->categoryService->index($validate['per_page'] ?? 10);
+
+        return CategoryResource::collection($categories);
+    }
+
+    public function store(CategoryFormRequest $request){
+        $validate = $request->validated();
+        $category = $this->categoryService->store($validate);
+
+        return new CategoryResource($category);
+    }
+
+    public function show($id){
+        $data = $this->categoryService->show($id);
+
+        return new CategoryResource($data);
+    }
+
+    public function update(CategoryFormRequest $request,$id){
+        $validate = $request->validated();
+        $category = $this->categoryService->update($validate,$id);
+
+        return new CategoryResource($category);
+
+    }
+    public function destroy($id){
+        $this->categoryService->delete($id);
+
+        return response()->json([
+            'message' => 'Category deleted.'
+        ], 200);
+    }
+
     public function tree()
     {
-        $categoryTree = Cache::remember('categories', now()->addHour(), function () {
-            $categories = Category::orderBy('name')->get();
-            $categoriesByParent = $categories->groupBy('parent_id');
-            $buildTree = function ($parentId) use (&$buildTree, $categoriesByParent) {
-                $categoryTree = collect();
-                foreach ($categoriesByParent->get($parentId, collect()) as $category) {
-                    $childCategories = $buildTree($category->id);
-                    if ($category->is_active) {
-                        $category->setRelation('children', $childCategories);
-                        $categoryTree->push($category);
-                    } else {
-                        $categoryTree = $categoryTree->merge($childCategories);
-                    }
-                }
-
-                return $categoryTree->sortBy('name')->values();
-            };
-
-            return $buildTree(null);
-        });
+        $categoryTree = $this->categoryService->tree();
 
         return CategoryResource::collection($categoryTree);
     }
