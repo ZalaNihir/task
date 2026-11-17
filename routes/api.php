@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\WarehouseController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\StockController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -16,4 +17,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('categories',CategoryController::class);
     Route::apiResource('products',ProductController::class);
     Route::apiResource('warehouse',WarehouseController::class);
+    Route::post('/stock/adjust', [StockController::class, 'adjust']);
 });
