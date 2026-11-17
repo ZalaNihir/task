@@ -222,6 +222,8 @@ The total units in, total units out, and net movement are calculated
 using database-level aggregation rather than loading all movement
 records and calculating totals in PHP.
 
+AI assistance (Codex) was used to debug selected errors, prepare the README documentation, and implement filtering functionality in the product module. The generated suggestions were reviewed and adapted during development.
+
 ## Caching Strategy
 
 Redis is used as the cache driver for frequently accessed data.
