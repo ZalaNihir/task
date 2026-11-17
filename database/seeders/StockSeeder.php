@@ -19,9 +19,10 @@ class StockSeeder extends Seeder
                 $quantity = rand(10, 100);
                 $reserved = rand(1, 9);
 
-                Stock::create([
+                Stock::updateOrCreate([
                     'product_id'   => $productId,
                     'warehouse_id' => $warehouseId,
+                ],[
                     'quantity'     => $quantity,
                     'reserved_quantity' => $reserved,
                 ]);
