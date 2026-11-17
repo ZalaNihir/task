@@ -22,6 +22,13 @@ class ProductResource extends JsonResource
             'description' => $this->description,
             'base_price' => $this->base_price,
             'is_active' => $this->is_active,
+            // 'stock' => $this->stocks->map(function ($stock) {
+            //     return [
+            //         'warehouse_id' => $stock->warehouse_id,
+            //         'quantity' => $stock->quantity,
+            //         'reserved_quantity' => $stock->reserved_quantity,
+            //     ];
+            // }),
         ];
     }
 }

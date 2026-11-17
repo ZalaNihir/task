@@ -22,7 +22,15 @@ class ProductIndexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'per_page' => ['sometimes', 'integer', 'min:5', 'max:100'],
+            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
+            'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
+            'availability' => ['nullable', 'boolean'],
+            'min_price' => ['nullable', 'numeric', 'min:0'],
+            'max_price' => ['nullable','numeric','min:0','gte:min_price'],
+            'search' => ['nullable', 'string', 'max:255'],
+            'sort_by' => ['nullable','in:name,price,available_stock',],
+            'sort_order' => ['nullable','in:asc,desc'],
+            'per_page' => ['nullable', 'integer', 'min:5', 'max:100'],
         ];
     }
 }
