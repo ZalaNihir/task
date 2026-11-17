@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StockAdjustmentRequest;
+use App\Http\Resources\InventorySummaryResource;
 use App\Http\Resources\StockAdjustmentResource;
 use App\Services\StockService;
 use Illuminate\Http\Request;
@@ -17,6 +18,13 @@ class StockController extends Controller
         $stock = $this->stockService->adjust($request->validated());
 
         return new StockAdjustmentResource($stock);
+    }
+
+    public function summary()
+    {
+        $summary = $this->stockService->summary();
+
+        return InventorySummaryResource::collection($summary);
     }
 
 }
