@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CategoryFormRequest;
-use App\Http\Requests\CategoryIndexRequest;
+use App\Http\Requests\IndexRequest;
 use App\Http\Resources\CategoryResource;
 use App\Services\CategoryService;
 
@@ -12,7 +12,7 @@ class CategoryController extends Controller
 {
     public function __construct(protected CategoryService $categoryService){}
 
-    public function index(CategoryIndexRequest $request){
+    public function index(IndexRequest $request){
         $validate = $request->validated();
         $categories = $this->categoryService->index($validate['per_page'] ?? 10);
 

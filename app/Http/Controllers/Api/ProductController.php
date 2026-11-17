@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductFormRequest;
 use App\Http\Requests\ProductIndexRequest;
 use App\Http\Resources\ProductResource;
@@ -45,4 +46,5 @@ class ProductController extends Controller
             'message' => 'Product deleted.'
         ]);
     }
+
 }
