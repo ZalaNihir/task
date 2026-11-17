@@ -13,5 +13,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('categories/tree', [CategoryController::class, 'tree'])->name('categories.tree');
     Route::apiResource('categories',CategoryController::class);
-    Route::get('products',[ProductController::class,'index']);
+    Route::apiResource('products',ProductController::class);
 });
