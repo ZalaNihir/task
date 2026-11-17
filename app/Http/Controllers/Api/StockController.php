@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LowStockRequest;
 use App\Http\Requests\MovementHistoryRequest;
 use App\Http\Requests\StockAdjustmentRequest;
 use App\Http\Resources\InventorySummaryResource;
+use App\Http\Resources\LowStockResource;
 use App\Http\Resources\MovementHistoryResource;
 use App\Http\Resources\StockAdjustmentResource;
 use App\Services\StockService;
@@ -45,5 +47,12 @@ class StockController extends Controller
                     'net_movement' => $result['summary']['net_movement'],
                 ],
             ]);
+    }
+
+    public function lowStock(LowStockRequest $request){
+        $threshold = $request->validated()['threshold'] ?? 10;
+        $stocks = $this->stockService->lowStock($threshold);
+
+        return LowStockResource::collection($stocks);
     }
 }

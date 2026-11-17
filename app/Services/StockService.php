@@ -73,6 +73,7 @@ class StockService
                 'moved_at' => now(),
             ]);
             Cache::forget($this->chachekey);
+            Cache::tags(['low-stock'])->flush();
 
             return $stock;
         });
@@ -80,11 +81,9 @@ class StockService
     public function summary()
     {
         $cachedSummary = Cache::get($this->chachekey);
-
         if ($cachedSummary !== null) {
             return $cachedSummary;
         }
-
         $summary = Product::query()
             ->leftJoin('stocks', 'products.id', '=', 'stocks.product_id')
             ->select(
@@ -107,7 +106,6 @@ class StockService
             )
             ->groupBy('products.id', 'products.name', 'products.sku')
             ->get();
-
         if ($summary->isNotEmpty()) {
             Cache::put($this->chachekey,$summary,now()->addSeconds($this->ttl));
         }
@@ -136,7 +134,6 @@ class StockService
                 [$stokout]
             )
             ->first();
-
         $unitin = (int) $data->total_units_in;
         $unitout = (int) $data->total_units_out;
         $movements = $q
@@ -153,5 +150,16 @@ class StockService
                 'net_movement' => $unitin - $unitout,
             ],
         ];
+    }
+
+    public function lowStock($threshold)
+    {
+        $cache = 'low-stock:' . $threshold;
+        $stocks = Cache::tags(['low-stock'])->remember($cache,now()->addSeconds($this->ttl),function () use ($threshold) {
+                return Stock::with(['product', 'warehouse'])->whereRaw('quantity - reserved_quantity < ?', [$threshold])->orderByRaw('quantity - reserved_quantity')->get();
+            }
+        );
+
+        return $stocks;
     }
 }
